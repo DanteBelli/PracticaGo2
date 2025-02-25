@@ -37,7 +37,15 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("Usuario por Id encontrado: %d\n", user)
+	fmt.Printf("Usuario por id encontrado: %v\n", user)
+	userId, err := insertarUsuario(Usuario{
+		Nombre: "Dante",
+		Mail:   "pruebago@gmail.com",
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("El usuario agregado tiene el id: %v\n", userId)
 }
 
 type Usuario struct {
@@ -81,4 +89,15 @@ func usuarioPorId(id int32) (Usuario, error) {
 		return usuarios, fmt.Errorf("usuariosPorId %d: %v", id, err)
 	}
 	return usuarios, nil
+}
+func insertarUsuario(user Usuario) (int64, error) {
+	res, err := db.Exec("INSERT INTO usuarios(nombre , mail)VALUES(?,?)", user.Nombre, user.Mail)
+	if err != nil {
+		return 0, fmt.Errorf("insertarUsuario: %v", err)
+	}
+	id, err := res.LastInsertId()
+	if err != nil {
+		return 0, fmt.Errorf("insertarUsuario: %v", err)
+	}
+	return id, nil
 }
